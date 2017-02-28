@@ -1,17 +1,17 @@
-const host = '192.168.100.8';
-const port = 3000;
 const dgram = require('dgram');
+
 const server = dgram.createSocket('udp4');
+const address = '192.168.100.6';
+const port = 3000;
+const broadcastAddress = '192.168.100.255';
 
-server.bind(port, host);
-
-server.on('listening', () => {
-    console.log(`UDP server running on ${host}:${port}`);
+server.bind(port, address, () => {
     server.setBroadcast(true);
+    console.log(`UDP server running on ${address}:${port}`);
 });
 
-server.on('message', (msg, rinfo) => {
-    var date = new Date();
-    var currentTime = new Buffer(`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`);
-    server.send(currentTime, 0, currentTime.length, rinfo.port, rinfo.address);
-});
+setInterval(() => {
+    let date = new Date();
+    let currentTime = new Buffer(`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`);
+    server.send(currentTime, port, broadcastAddress);
+}, 1000);
